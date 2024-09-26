@@ -1,0 +1,21 @@
+{% extends 'main/base.html.twig' %}
+{% block head %}
+<head>
+    <meta charset="UTF-8">
+    <title>Bucket-List</title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+</head>
+{% endblock %}
+
+{%block content %}
+    <div class="flex justify-center items-center py-52">
+        <div class="bg-white shadow-lg rounded-lg p-8 max-w-md">
+            <h3 class="text-2xl font-bold text-center pb-3">À propos de nous</h3>
+            <p class="text-gray-700">
+                Lorem ipsum dolor sit amet. Sit Quis laborum aut aspernatur omnis id facilis dolorem et facere voluptatem qui velit sunt eos corrupti quia sed libero assumenda. Aut dolores facilis aut similique molestiae hic consequatur voluptas et internos sequi est animi omnis ex voluptatibus maiores id tempore corporis. Et voluptatem consequatur nam galisum rerum ex aliquid odio aut dolores quae. Ut velit magni qui sapiente magnam quo suscipit aperiam qui inventore voluptatem.
+            </p>
+        </div>
+    </div>
+{% endblock %}

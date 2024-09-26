@@ -1,3 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
     background-color: skyblue;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+html, body {
+    height: 100%; /* S'assurer que la hauteur de la page prend tout l'espace disponible */
+    margin: 0;
+}
+
+main {
+    flex-grow: 1; /* Permet au contenu principal de prendre l'espace restant */
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
 }
