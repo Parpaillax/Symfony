@@ -27,12 +27,33 @@ class WishRepository extends ServiceEntityRepository
         ->getResult();
     }
 
-    public function findOneById($value): ?Wish
+    public function findOneById(int $value): ?Wish
     {
       return $this->createQueryBuilder('w')
         ->andWhere('w.id = :val')
         ->setParameter('val', $value)
         ->getQuery()
         ->getOneOrNullResult();
+    }
+
+    public function delete(Wish $wish): void
+    {
+      $this->getEntityManager()->remove($wish);
+      $this->getEntityManager()->flush();
+    }
+
+    public function update(Wish $wish): ?Wish
+    {
+      $newWish = $this->findOneById($wish->getId());
+
+      $newWish->setDateModified(new \DateTimeImmutable());
+      $newWish->setName($wish->getName());
+      $newWish->setAuthor($wish->getAuthor());
+      $newWish->setContent($wish->getContent());
+      $newWish->setPublished($wish->isPublished());
+      $newWish->setDuration($wish->getDuration());
+
+      $this->getEntityManager()->flush();
+      return $newWish;
     }
 }

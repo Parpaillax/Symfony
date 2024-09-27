@@ -18,6 +18,11 @@
           <li><a href="{{ path('wish_detail', {'id': wish.id}) }}">{{ wish.name }}</a></li>
         {% endfor %}
       </ul>
+      <a href="/wish/new">
+        <button type="button" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto">
+          Créer un voeu
+        </button>
+      </a>
     </div>
   </div>
 {% endblock %}
