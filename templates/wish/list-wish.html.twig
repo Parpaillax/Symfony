@@ -1,0 +1,23 @@
+{% extends 'main/base.html.twig' %}
+{% block head %}
+  <head>
+    <meta charset="UTF-8">
+    <title>Bucket-List</title>
+    {% block stylesheets %}
+      {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+  </head>
+{% endblock %}
+
+{% block content %}
+  <div class="flex justify-center items-center py-52">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
+      <h2 class="text-4xl font-extrabold dark:text-white pb-6">Liste de tous mes voeux</h2>
+      <ul>
+        {% for wish in wishes %}
+          <li><a href="{{ path('wish_detail', {'id': wish.id}) }}">{{ wish.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endblock %}
