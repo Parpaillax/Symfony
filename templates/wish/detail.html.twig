@@ -13,8 +13,10 @@
   <div class="flex flex-col justify-center items-center py-52">
     <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
       <h4 class="text-2xl font-bold text-center pb-3">{{ wish.name }}</h4>
+      <img src="{{ wish.imageFilename ? asset('upload/image/wish/' ~ wish.imageFilename) : "" }}">
       <p class="text-gray-700 text-justify mb-4 break-words">{{ wish.content }}</p>
       <p class="text-gray-700 text-justify mb-4">{{ wish.author }} </p>
+      <p class="text-gray-700 text-justify mb-4">Publié : {{ wish.published ? "Oui":"Non" }}</p>
       <p class="text-gray-700 text-justify mb-4">{{ wish.dateCreated|date('d-m-Y') }}</p>
       <div class="flex flex-row justify-between">
         <form method="post" action="{{ path('wish_delete', {'id': wish.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce souhait ?');">

@@ -26,6 +26,9 @@ class Wish
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $duration = null;
 
+    #[ORM\Column(type: 'string')]
+    private string $imageFilename;
+
     #[ORM\Column(options: ['default' => false])]
     private ?bool $published = null;
 
@@ -128,4 +131,17 @@ class Wish
         $this->author = $author;
         return $this;
     }
+
+    public function getImageFilename(): string
+    {
+      return $this->imageFilename;
+    }
+
+    public function setImageFilename(string $imageFilename): static
+    {
+      $this->imageFilename = $imageFilename;
+      return $this;
+    }
+
+
 }

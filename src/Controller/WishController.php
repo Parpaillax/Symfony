@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Wish;
 use App\Form\WishType;
+use App\Service\FileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,8 +18,10 @@ use App\Repository\WishRepository;
 class WishController extends AbstractController
 {
     private WishRepository $wishRepository;
-    public function __construct(WishRepository $wishRepository) {
+    private FileUploader $fileUploader;
+    public function __construct(WishRepository $wishRepository, FileUploader $fileUploader) {
       $this->wishRepository = $wishRepository;
+      $this->fileUploader = $fileUploader;
     }
 
     #[Route('/list', name: 'list', methods: ['GET'])]
@@ -42,6 +45,11 @@ class WishController extends AbstractController
       $formWish = $this->createForm(WishType::class, $newWish);
       $formWish->handleRequest($request);
       if ($formWish->isSubmitted() && $formWish->isValid()) {
+        $imageFile = $formWish->get('image')->getData();
+        if ($imageFile) {
+          $imageFilename = $this->fileUploader->upload($imageFile);
+          $newWish->setImageFilename($imageFilename);
+        }
         $em->persist($newWish);
         $em->flush();
         $this->addFlash('success', 'Le voeu est bien crée');
@@ -72,6 +80,11 @@ class WishController extends AbstractController
         $wishToUpdate = $this->wishRepository->update($wish);
         if (!$wishToUpdate) {
           throw $this->createNotFoundException('No wish found');
+        }
+        $imageFile = $formWish->get('image')->getData();
+        if ($imageFile) {
+          $imageFilename = $this->fileUploader->upload($imageFile);
+          $wishToUpdate->setImageFilename($imageFilename);
         }
         $this->addFlash('success', 'Le voeu est bien modifié');
         return $this->redirectToRoute('wish_detail', ['id' => $wishToUpdate->getId()]);

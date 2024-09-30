@@ -9,7 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class WishType extends AbstractType
 {
@@ -41,9 +45,24 @@ class WishType extends AbstractType
                   'class' => 'w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500',
                 ]
             ])
-//            ->add('dateModified', null, [
-//                'widget' => 'single_text',
-//            ])
+          ->add('image', FileType::class, [
+            'label' => 'Image',
+            'mapped' => false,
+            'required' => false,
+            'attr' => [
+              'class' => 'w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500',
+            ],
+            'constraints' => [
+              new File([
+                'maxSize' => '1024k',
+                'mimeTypes' => [
+                  'image/png',
+                  'image/jpeg',
+                ],
+                'mimeTypesMessage' => 'Please upload a valid image',
+              ])
+            ],
+          ])
         ;
     }
 
