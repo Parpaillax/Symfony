@@ -10,16 +10,24 @@
 {% endblock %}
 
 {% block content %}
-  <div class="flex flex-col justify-center items-center py-52">
+  <div class="flex flex-col justify-center items-center py-24">
     <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
       <h4 class="text-2xl font-bold text-center pb-3">{{ wish.name }}</h4>
-      <img src="{{ wish.imageFilename ? asset('upload/image/wish/' ~ wish.imageFilename) : "" }}">
+      <img class="mb-4" src="{{ wish.imageFilename ? asset('upload/image/wish/' ~ wish.imageFilename) : "" }}">
       <p class="text-gray-700 text-justify mb-4 break-words">{{ wish.content }}</p>
-      <p class="text-gray-700 text-justify mb-4">{{ wish.author }} </p>
-      <p class="text-gray-700 text-justify mb-4">Publié : {{ wish.published ? "Oui":"Non" }}</p>
-      <p class="text-gray-700 text-justify mb-4">{{ wish.dateCreated|date('d-m-Y') }}</p>
+      <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Auteur : </span> {{ wish.author }} </p>
+      <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Réalisé :</span> {{ wish.realised ? "✔️":"❌" }}</p>
+      <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Catégorie :</span> {{ wish.category ? wish.category.name : '❓' }}</p>
+      <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Date : </span> {{ wish.dateCreated|date('d-m-Y') }}</p>
+      <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Nombres de participants : </span> {{ wish.players|length }}</p>
+      {% if wish.players|length > 0 %}
+        <p class="text-gray-700 text-justify mb-4"><span class="font-medium">Liste des participants : </span></p>
+        {% for player in wish.players %}
+          <li class="sm:pb-4">{{ player.firstName ~ ' ' ~ player.lastName }}</li>
+        {% endfor %}
+      {% endif %}
       <div class="flex flex-row justify-between">
-        <form method="post" action="{{ path('wish_delete', {'id': wish.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce souhait ?');">
+        <form method="post" action="{{ path('wish_delete', {'id': wish.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce souhait ?');" class="mr-4">
           <input type="hidden" name="_method" value="DELETE">
           <button type="submit" class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
             Supprimer

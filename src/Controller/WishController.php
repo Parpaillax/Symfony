@@ -41,54 +41,77 @@ class WishController extends AbstractController
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function newWish(Request $request, EntityManagerInterface $em): Response
     {
-      $newWish = new Wish();
-      $formWish = $this->createForm(WishType::class, $newWish);
-      $formWish->handleRequest($request);
-      if ($formWish->isSubmitted() && $formWish->isValid()) {
-        $imageFile = $formWish->get('image')->getData();
-        if ($imageFile) {
-          $imageFilename = $this->fileUploader->upload($imageFile);
-          $newWish->setImageFilename($imageFilename);
+      try {
+        $newWish = new Wish();
+        $newWish->setDateCreated(new \DateTimeImmutable());
+        $formWish = $this->createForm(WishType::class, $newWish);
+        $formWish->handleRequest($request);
+        if ($formWish->isSubmitted() && $formWish->isValid()) {
+          $imageFile = $formWish->get('image')->getData();
+          if ($imageFile) {
+            $imageFilename = $this->fileUploader->upload($imageFile);
+            $newWish->setImageFilename($imageFilename);
+          }
+          $em->persist($newWish);
+          $em->flush();
+          $this->addFlash('success', 'Le voeu est bien crée');
+          return $this->redirectToRoute('wish_detail', ['id' => $newWish->getId()]);
         }
-        $em->persist($newWish);
-        $em->flush();
-        $this->addFlash('success', 'Le voeu est bien crée');
-        return $this->redirectToRoute('wish_detail', ['id' => $newWish->getId()]);
+        return $this->render('wish/new.html.twig', ['formWish' => $formWish]);
+      } catch(\Exception $e) {
+        $this->addFlash('error', $e->getMessage());
+        return $this->render('wish/new.html.twig', ['formWish' => $this->createForm(WishType::class, new Wish())]);
       }
-      return $this->render('wish/new.html.twig', ['formWish' => $formWish]);
     }
 
     #[Route('/delete/{id}', name: 'delete', methods: ['DELETE'])]
     public function deleteWish(Request $request, int $id): Response
     {
-      $wishToDelete = $this->wishRepository->findOneById($id);
-      if (!$wishToDelete) {
-        throw $this->createNotFoundException(
-          'No wish found for id '.$id
-        );
+      try {
+        $wishToDelete = $this->wishRepository->findOneById($id);
+        if (!$wishToDelete) {
+          throw $this->createNotFoundException(
+            'No wish found for id '.$id
+          );
+        }
+        $this->wishRepository->delete($wishToDelete);
+        $this->addFlash('success', 'Le voeu est bien supprimé');
+        return $this->redirectToRoute('wish_list');
+      } catch(\Exception $e) {
+        $this->addFlash('error', 'Le voeu n\'a pas pu être supprimé');
+        return $this->redirectToRoute('wish_list');
       }
-      $this->wishRepository->delete($wishToDelete);
-      return $this->redirectToRoute('wish_list');
     }
 
     #[Route('/update/{id}', name: 'update', methods: ['POST', 'GET'])]
     public function updateWish(Request $request, Wish $wish): Response
     {
-      $formWish = $this->createForm(WishType::class, $wish);
-      $formWish->handleRequest($request);
-      if ($formWish->isSubmitted() && $formWish->isValid()) {
-        $wishToUpdate = $this->wishRepository->update($wish);
-        if (!$wishToUpdate) {
-          throw $this->createNotFoundException('No wish found');
+      try {
+        $formWish = $this->createForm(WishType::class, $wish);
+        $formWish->handleRequest($request);
+        if ($formWish->isSubmitted() && $formWish->isValid()) {
+          $imageFile = $formWish->get('image')->getData();
+          if (($formWish->has('deleteImage') && $formWish['deleteImage']->getData()) || $imageFile) {
+            $this->fileUploader->delete($wish->getImageFilename(), '/upload/image/wish');
+            if ($imageFile) {
+              $imageFilename = $this->fileUploader->upload($imageFile);
+              $wish->setImageFilename($imageFilename);
+            } else {
+              $wish->setImageFilename('');
+            }
+          }
+          $wishToUpdate = $this->wishRepository->update($wish);
+          if (!$wishToUpdate) {
+            throw $this->createNotFoundException('No wish found');
+          }
+          $this->addFlash('success', 'Le voeu est bien modifié');
+          return $this->redirectToRoute('wish_detail', ['id' => $wishToUpdate->getId()]);
         }
-        $imageFile = $formWish->get('image')->getData();
-        if ($imageFile) {
-          $imageFilename = $this->fileUploader->upload($imageFile);
-          $wishToUpdate->setImageFilename($imageFilename);
-        }
-        $this->addFlash('success', 'Le voeu est bien modifié');
-        return $this->redirectToRoute('wish_detail', ['id' => $wishToUpdate->getId()]);
+        return $this->render('wish/edit.html.twig', ['formWish' => $formWish]);
+      } catch(\Exception $e) {
+        $formWish = $this->createForm(WishType::class, $wish);
+        $this->addFlash('error', $e->getMessage());
+        return $this->render('wish/edit.html.twig', ['formWish' => $formWish]);
       }
-      return $this->render('wish/edit.html.twig', ['formWish' => $formWish]);
     }
 }

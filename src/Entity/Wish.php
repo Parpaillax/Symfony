@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\WishRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -30,7 +32,7 @@ class Wish
     private string $imageFilename;
 
     #[ORM\Column(options: ['default' => false])]
-    private ?bool $published = null;
+    private ?bool $realised = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $dateCreated = null;
@@ -38,9 +40,20 @@ class Wish
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $dateModified = null;
 
+    #[ORM\ManyToOne(inversedBy: 'wishes')]
+    private ?Categorie $category = null;
+
+    /**
+     * @var Collection<int, Player>
+     */
+    #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'wishes')]
+    private Collection $players;
+
     public function __construct()
     {
-        $this->published = false;
+        $this->realised = false;
+        $this->imageFilename = "";
+        $this->players = new ArrayCollection();
     }
 
 
@@ -85,15 +98,14 @@ class Wish
         return $this;
     }
 
-    public function isPublished(): ?bool
+    public function isRealised(): ?bool
     {
-        return $this->published;
+        return $this->realised;
     }
 
-    public function setPublished(bool $published): static
+    public function setRealised(bool $realised): static
     {
-        $this->published = $published;
-
+        $this->realised = $realised;
         return $this;
     }
 
@@ -141,6 +153,42 @@ class Wish
     {
       $this->imageFilename = $imageFilename;
       return $this;
+    }
+
+    public function getCategory(): ?Categorie
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Categorie $category): static
+    {
+        $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Player>
+     */
+    public function getPlayers(): Collection
+    {
+        return $this->players;
+    }
+
+    public function addPlayer(Player $player): static
+    {
+        if (!$this->players->contains($player)) {
+            $this->players->add($player);
+        }
+
+        return $this;
+    }
+
+    public function removePlayer(Player $player): static
+    {
+        $this->players->removeElement($player);
+
+        return $this;
     }
 
 

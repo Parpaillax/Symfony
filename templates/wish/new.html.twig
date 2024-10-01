@@ -1,5 +1,4 @@
 {% extends 'main/base.html.twig' %}
-{% form_theme formWish 'bootstrap_3_horizontal_layout.html.twig' %}
 {% block head %}
   <head>
     <meta charset="UTF-8">
@@ -11,12 +10,20 @@
 {% endblock %}
 
 {% block content %}
-  <div class="flex justify-center items-center py-36">
-    <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
+  <div class="flex justify-center items-center py-14">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-full text-center">
       <h2 class="text-4xl font-extrabold dark:text-white pb-6">Création d'un voeu</h2>
       {{ form_start(formWish) }}
-      {{ form_widget(formWish) }}
-      <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto" type="submit">Créer</button>
+        {{ form_row(formWish.name, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.content, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.author, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.category, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.players, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.duration, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.realised, {'attr': {'class':'w-4 h-4 mb-4 border-gray-300 rounded mx-2'}}) }}
+        {{ form_row(formWish.dateCreated, {'attr': {'class':'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500'}}) }}
+        {{ form_row(formWish.image, {'attr': {'class':'w-full mb-4 px-4 py-2'}}) }}
+        <button class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto" type="submit">Créer</button>
       {{ form_end(formWish) }}
     </div>
   </div>

@@ -33,4 +33,13 @@ class FileUploader
   {
     return $this->targetDirectory;
   }
+
+  public function delete(?string $filename, string $rep): void
+  {
+    if (null != $filename) {
+      if (file_exists($rep . '/' . $filename)) {
+        unlink($rep . '/' . $filename);
+      }
+    }
+  }
 }

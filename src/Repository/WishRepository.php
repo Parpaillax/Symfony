@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Wish;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -19,12 +20,17 @@ class WishRepository extends ServiceEntityRepository
     /**
      * @return Wish[] Returns an array of Wish objects
      */
-    public function findAllWishes(): array
+    public function findAllWishes(): Paginator
     {
-      return $this->createQueryBuilder('w')
+      $qb = $this->createQueryBuilder('w')
+        ->addSelect('players')
+        ->addSelect('category')
+        ->leftJoin('w.category', 'category')
+        ->leftJoin('w.players', 'players')
         ->orderBy('w.dateCreated', 'ASC')
-        ->getQuery()
-        ->getResult();
+        ->getQuery();
+
+      return new Paginator($qb);
     }
 
     public function findOneById(int $value): ?Wish
@@ -50,8 +56,9 @@ class WishRepository extends ServiceEntityRepository
       $newWish->setName($wish->getName());
       $newWish->setAuthor($wish->getAuthor());
       $newWish->setContent($wish->getContent());
-      $newWish->setPublished($wish->isPublished());
+      $newWish->setRealised($wish->isRealised());
       $newWish->setDuration($wish->getDuration());
+      $newWish->setImageFilename($wish->getImageFilename());
 
       $this->getEntityManager()->flush();
       return $newWish;

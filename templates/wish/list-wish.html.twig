@@ -10,16 +10,48 @@
 {% endblock %}
 
 {% block content %}
-  <div class="flex justify-center items-center py-52">
+  <div class="flex justify-center items-center py-14">
     <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
       <h2 class="text-4xl font-extrabold dark:text-white pb-6">Liste de tous mes voeux</h2>
-      <ul>
+      <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
         {% for wish in wishes %}
-          <li><a href="{{ path('wish_detail', {'id': wish.id}) }}">{{ wish.name }}</a></li>
+          <li class="py-3 sm:pb-4">
+            <div class="flex-inline items-center justify-between">
+              <div class="flex-grow flex-col">
+                <p class="text-gray-700 font-bold">{{ wish.name }}</p>
+                <p class="text-gray-700 font-light">{{ wish.category ? wish.category.name : '❓' }}</p>
+              </div>
+              <div class="flex-grow text-center">
+                <p>{{ wish.players|length }}</p>
+              </div>
+              <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white space-x-4 ml-auto">
+                <a href="{{ path('wish_detail', {'id': wish.id}) }}">
+                  <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white font-bold p-1 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+                    <img src="{{ asset('img/show.png') }}" height="20" width="20">
+                  </button>
+                </a>
+
+                <a href="{{ path('wish_update', {'id': wish.id}) }}">
+                  <button type="submit" class="bg-green-500 hover:bg-green-400 text-white font-bold p-1 border-b-4 border-green-700 hover:border-green-500 rounded">
+                    <img src="{{ asset('img/edit.png') }}" height="20" width="20">
+                  </button>
+                </a>
+
+                <form method="post" action="{{ path('wish_delete', {'id': wish.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce souhait ?');">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button type="submit" class="bg-red-500 hover:bg-red-400 text-white font-bold p-1 border-b-4 border-red-700 hover:border-red-500 rounded">
+                    <img src="{{ asset('img/delete.png') }}" height="20" width="20">
+                  </button>
+                </form>
+              </div>
+            </div>
+          </li>
+        {% else %}
+          <p class="text-gray-700 font-bold">La liste de voeu est vide</p>
         {% endfor %}
       </ul>
       <a href="/wish/new">
-        <button type="button" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto">
+        <button type="button" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 py-2 mt-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto">
           Créer un voeu
         </button>
       </a>
