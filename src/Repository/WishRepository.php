@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Wish;
+use App\Service\Censurator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,14 +49,13 @@ class WishRepository extends ServiceEntityRepository
       $this->getEntityManager()->flush();
     }
 
-    public function update(Wish $wish): ?Wish
+    public function update(Wish $wish, Censurator $censurator): ?Wish
     {
       $newWish = $this->findOneById($wish->getId());
 
       $newWish->setDateModified(new \DateTimeImmutable());
       $newWish->setName($wish->getName());
-      $newWish->setAuthor($wish->getAuthor());
-      $newWish->setContent($wish->getContent());
+      $newWish->setContent($censurator->purify($wish->getContent()));
       $newWish->setRealised($wish->isRealised());
       $newWish->setDuration($wish->getDuration());
       $newWish->setImageFilename($wish->getImageFilename());

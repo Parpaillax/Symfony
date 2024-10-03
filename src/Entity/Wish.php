@@ -22,9 +22,6 @@ class Wish
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $author = null;
-
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $duration = null;
 
@@ -48,6 +45,10 @@ class Wish
      */
     #[ORM\ManyToMany(targetEntity: Player::class, inversedBy: 'wishes')]
     private Collection $players;
+
+    #[ORM\ManyToOne(inversedBy: 'wishes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -133,17 +134,6 @@ class Wish
         return $this;
     }
 
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): static
-    {
-        $this->author = $author;
-        return $this;
-    }
-
     public function getImageFilename(): string
     {
       return $this->imageFilename;
@@ -191,5 +181,15 @@ class Wish
         return $this;
     }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
 
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
 }

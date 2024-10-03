@@ -23,3 +23,14 @@ footer {
     padding: 20px;
     text-align: center;
 }
+
+.star {
+    cursor: pointer;
+    font-size: 2rem;
+    color: lightgray;
+    transition: color 0.3s;
+}
+
+.star.text-yellow-500 {
+    color: gold;
+}

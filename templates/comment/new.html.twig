@@ -1,0 +1,59 @@
+{% extends 'main/base.html.twig' %}
+{% block head %}
+  <head>
+    <meta charset="UTF-8">
+    <title>Bucket-List</title>
+    {% block stylesheets %}
+      {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+  </head>
+{% endblock %}
+
+{% block content %}
+  <div class="flex justify-center items-center py-48">
+    <div class="bg-white shadow-lg rounded-lg p-8 max-w-full text-center">
+      <h2 class="text-4xl font-extrabold dark:text-white pb-6">Commenter et noté l'objectif</h2>
+      {{ form_start(formComment) }}
+
+      {{ form_row(formComment.content) }}
+      {{ form_label(formComment.score) }}
+      <div class="star-rating mb-4">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+      </div>
+
+      {{ form_widget(formComment.score) }}
+
+      <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
+        Commenter
+      </button>
+
+      {{ form_end(formComment) }}
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const stars = document.querySelectorAll('.star');
+      const ratingValueInput = document.querySelector('.star-rating-value');
+
+      stars.forEach(star => {
+        star.addEventListener('click', function () {
+          const rating = this.getAttribute('data-value');
+
+          // Mettre à jour l'affichage des étoiles (style actif)
+          stars.forEach(s => s.classList.remove('text-yellow-500'));
+          for (let i = 0; i < rating; i++) {
+              stars[i].classList.add('text-yellow-500');
+          }
+
+          // Mettre à jour la valeur du champ caché
+          ratingValueInput.value = rating;
+        });
+      });
+    });
+  </script>
+{% endblock %}

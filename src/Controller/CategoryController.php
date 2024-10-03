@@ -18,14 +18,6 @@ class CategoryController extends AbstractController
     $this->repository = $repository;
   }
 
-  #[Route('/list', name: 'list')]
-  public function index(): Response
-  {
-      return $this->render('category/index.html.twig', [
-          'controller_name' => 'CategoryController',
-      ]);
-  }
-
   #[Route('/delete/{id}', name: 'delete', methods: ['GET'])]
   public function delete(Categorie $categorie, Request $request): Response
   {

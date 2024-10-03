@@ -12,7 +12,7 @@
 {% block content %}
   <div class="flex justify-center items-center py-14">
     <div class="bg-white shadow-lg rounded-lg p-8 max-w-md text-center">
-      <h2 class="text-4xl font-extrabold dark:text-white pb-6">Liste de tous mes voeux</h2>
+      <h2 class="text-4xl font-extrabold dark:text-white pb-6">Liste des objectifs</h2>
       <ul class="max-w-md divide-y divide-gray-200 dark:divide-gray-700">
         {% for wish in wishes %}
           <li class="py-3 sm:pb-4">
@@ -50,11 +50,13 @@
           <p class="text-gray-700 font-bold">La liste de voeu est vide</p>
         {% endfor %}
       </ul>
-      <a href="/wish/new">
-        <button type="button" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 py-2 mt-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto">
-          Créer un voeu
-        </button>
-      </a>
+      {% if app.user %}
+        <a href="/wish/new">
+          <button type="button" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-4 py-2 mt-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mx-auto">
+            Créer un voeu
+          </button>
+        </a>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

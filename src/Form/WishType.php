@@ -37,11 +37,11 @@ class WishType extends AbstractType
                 'placeholder' => 'Description du voeu',
               ], 'label_attr' => ['class' => 'text-gray-700 font-bold']
             ])
-            ->add('author', TextType::class, ['label' => 'Auteur', 'attr' => [
-              'class' => 'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500',
-              'placeholder' => 'Auteur du voeu',
-            ], 'label_attr' => ['class' => 'text-gray-700 font-bold']
-            ])
+//            ->add('author', TextType::class, ['label' => 'Auteur', 'attr' => [
+//              'class' => 'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500',
+//              'placeholder' => 'Auteur du voeu',
+//            ], 'label_attr' => ['class' => 'text-gray-700 font-bold']
+//            ])
             ->add('category', EntityType::class, ['label' => 'Catégorie',
               'attr' => [
                 'class' => 'w-full mb-4 px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500',

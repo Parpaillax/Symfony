@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Wish;
 use App\Form\WishType;
+use App\Repository\CommentRepository;
+use App\Service\Censurator;
 use App\Service\FileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,15 +16,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\WishRepository;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/wish', name: 'wish_')]
 class WishController extends AbstractController
 {
     private WishRepository $wishRepository;
     private FileUploader $fileUploader;
-    public function __construct(WishRepository $wishRepository, FileUploader $fileUploader) {
+    private CommentRepository $commentRepository;
+    public function __construct(WishRepository $wishRepository, FileUploader $fileUploader, CommentRepository $commentRepository) {
       $this->wishRepository = $wishRepository;
       $this->fileUploader = $fileUploader;
+      $this->commentRepository = $commentRepository;
     }
 
     #[Route('/list', name: 'list', methods: ['GET'])]
@@ -35,11 +41,14 @@ class WishController extends AbstractController
     public function wishId(int $id): Response
     {
       $wish = $this->wishRepository->findOneById($id);
-      return $this->render('wish/detail.html.twig', ['wish' => $wish]);
+      $comments = $this->commentRepository->findCommentsByWishId($id);
+      $averageScore = $this->calculateAverageScore($comments);
+      return $this->render('wish/detail.html.twig', ['wish' => $wish, 'comments' => $comments, 'averageScore' => $averageScore]);
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function newWish(Request $request, EntityManagerInterface $em): Response
+    #[IsGranted('ROLE_USER')]
+    public function newWish(Request $request, EntityManagerInterface $em, Censurator $censurator): Response
     {
       try {
         $newWish = new Wish();
@@ -52,6 +61,8 @@ class WishController extends AbstractController
             $imageFilename = $this->fileUploader->upload($imageFile);
             $newWish->setImageFilename($imageFilename);
           }
+          $newWish->setContent($censurator->purify($newWish->getContent()));
+          $newWish->setUser($this->getUser());
           $em->persist($newWish);
           $em->flush();
           $this->addFlash('success', 'Le voeu est bien crée');
@@ -65,10 +76,15 @@ class WishController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_USER')]
     public function deleteWish(Request $request, int $id): Response
     {
       try {
         $wishToDelete = $this->wishRepository->findOneById($id);
+        if(!($wishToDelete->getUser()===$this->getUser() ||  $this->isGranted('ROLE_ADMIN'))){
+          $this->addFlash('error', 'Vous ne pouvez pas supprimer un objectif dont vous n\'êtes pas l\'auteur');
+          return $this->redirectToRoute('wish_list');
+        }
         if (!$wishToDelete) {
           throw $this->createNotFoundException(
             'No wish found for id '.$id
@@ -84,9 +100,14 @@ class WishController extends AbstractController
     }
 
     #[Route('/update/{id}', name: 'update', methods: ['POST', 'GET'])]
-    public function updateWish(Request $request, Wish $wish): Response
+    #[IsGranted('ROLE_USER')]
+    public function updateWish(Request $request, Wish $wish, Censurator $censurator): Response
     {
       try {
+        if(!($wish->getUser()===$this->getUser() ||  $this->isGranted('ROLE_ADMIN'))){
+          $this->addFlash('error', 'Vous ne pouvez pas modifier un objectif dont vous n\'êtes pas l\'auteur');
+          return $this->redirectToRoute('wish_list');
+        }
         $formWish = $this->createForm(WishType::class, $wish);
         $formWish->handleRequest($request);
         if ($formWish->isSubmitted() && $formWish->isValid()) {
@@ -100,7 +121,7 @@ class WishController extends AbstractController
               $wish->setImageFilename('');
             }
           }
-          $wishToUpdate = $this->wishRepository->update($wish);
+          $wishToUpdate = $this->wishRepository->update($wish, $censurator);
           if (!$wishToUpdate) {
             throw $this->createNotFoundException('No wish found');
           }
@@ -114,4 +135,18 @@ class WishController extends AbstractController
         return $this->render('wish/edit.html.twig', ['formWish' => $formWish]);
       }
     }
+
+  private function calculateAverageScore(array $comments): ?float
+  {
+    if (count($comments) === 0) {
+      return null;
+    }
+
+    $totalScore = 0;
+    foreach ($comments as $comment) {
+      $totalScore += $comment->getScore();
+    }
+
+    return $totalScore / count($comments);
+  }
 }
